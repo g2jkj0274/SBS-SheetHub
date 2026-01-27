@@ -58,3 +58,30 @@
   color: #ffffff;
   font-weight: 600;
 }
+
+/* 다크모드 */
+@media (prefers-color-scheme: dark) {
+  .app-header {
+    background-color: #1f2937;
+    border-bottom-color: #374151;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .header-title {
+    color: #f3f4f6;
+  }
+
+  .nav-btn {
+    color: #d1d5db;
+  }
+
+  .nav-btn:hover {
+    background-color: #374151;
+    color: #f3f4f6;
+  }
+
+  .nav-btn.active {
+    background-color: #4b5563;
+    color: #f3f4f6;
+  }
+}

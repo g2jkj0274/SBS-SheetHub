@@ -318,3 +318,155 @@
   font-weight: 600;
 }
 
+/* 다크모드 */
+@media (prefers-color-scheme: dark) {
+  .audit-log-page h1 {
+    color: #f3f4f6;
+  }
+
+  .filter-section {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+  }
+
+  .filter-group label {
+    color: #d1d5db;
+  }
+
+  .filter-group select {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #f3f4f6;
+  }
+
+  .filter-group select:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+  }
+
+  .logs-table-wrapper {
+    border-color: #374151;
+  }
+
+  .logs-table {
+    background-color: #1f2937;
+  }
+
+  .logs-table thead {
+    background-color: #111827;
+    border-bottom-color: #374151;
+  }
+
+  .logs-table th {
+    color: #d1d5db;
+  }
+
+  .logs-table td {
+    border-bottom-color: #374151;
+    color: #d1d5db;
+  }
+
+  .logs-table tbody tr:hover {
+    background-color: #374151;
+  }
+
+  .datetime {
+    color: #f3f4f6;
+  }
+
+  .table-name {
+    color: #d1d5db;
+  }
+
+  .record-id {
+    color: #6ee7b7;
+  }
+
+  .data-cell pre {
+    background-color: #111827;
+    color: #d1d5db;
+    border-color: #374151;
+  }
+
+  .no-data {
+    color: #6b7280;
+  }
+
+  .loading {
+    color: #d1d5db;
+  }
+
+  .error {
+    background-color: #7f1d1d;
+    border-color: #b91c1c;
+    color: #fecaca;
+  }
+
+  .pagination-controls {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+
+  .page-size-selector span {
+    color: #d1d5db;
+  }
+
+  .page-size-btn {
+    border-color: #4b5563;
+    background-color: #374151;
+    color: #d1d5db;
+  }
+
+  .page-size-btn:hover {
+    border-color: #10b981;
+    color: #10b981;
+  }
+
+  .page-size-btn.active {
+    background-color: #10b981;
+    color: white;
+    border-color: #10b981;
+  }
+
+  .page-info {
+    color: #9ca3af;
+  }
+
+  .pagination-footer {
+    border-top-color: #374151;
+  }
+
+  .pagination-btn {
+    border-color: #4b5563;
+    background-color: #374151;
+    color: #d1d5db;
+  }
+
+  .pagination-btn:hover:not(:disabled) {
+    border-color: #10b981;
+    color: #10b981;
+    background-color: #1f2937;
+  }
+
+  .pagination-btn:disabled {
+    color: #6b7280;
+  }
+
+  .pagination-number {
+    border-color: #4b5563;
+    background-color: #374151;
+    color: #d1d5db;
+  }
+
+  .pagination-number:hover {
+    border-color: #10b981;
+    color: #10b981;
+  }
+
+  .pagination-number.active {
+    background-color: #10b981;
+    color: white;
+    border-color: #10b981;
+  }
+}
+
