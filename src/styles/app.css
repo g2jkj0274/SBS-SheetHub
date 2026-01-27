@@ -1,0 +1,18 @@
+/* 앱 전체 레이아웃 */
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Header가 있어도 메인 영역이 중앙 정렬되도록 */
+.app-container {
+  min-height: calc(100vh - 64px); /* 헤더 높이가 다르면 조정 가능 */
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.feedback-card,
+.feedback-card * {
+  box-sizing: border-box;
+}

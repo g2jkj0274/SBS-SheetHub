@@ -1,0 +1,76 @@
+/* 시계 페이지 */
+.clock-page {
+  width: 100%;
+  display: grid;
+  place-items: center;
+}
+
+/* 원형 링 컨테이너 */
+.clock-ring {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  display: grid;
+  place-items: center;
+}
+
+/* SVG (원형 테두리) */
+.clock-svg {
+  display: block;
+}
+
+/* 원 시작 위치를 12시 방향으로 회전 */
+.clock-ring-seg,
+.clock-ring-bg {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* 배경 링 */
+.clock-ring-bg {
+  stroke: rgba(255, 255, 255, 0.14);
+}
+
+/* 중앙 시간 표시 */
+.clock-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  pointer-events: none;
+}
+
+.clock-time {
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.clock-sub {
+  margin-top: 8px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* ===== 원 회전 애니메이션 ===== */
+@keyframes rotateRing {
+  from {
+    transform: rotate(-90deg) rotate(0deg);
+  }
+  to {
+    transform: rotate(-90deg) rotate(360deg);
+  }
+}
+
+/* 실제로 회전할 대상 */
+.clock-svg {
+  animation: rotateRing 20s linear infinite;
+}
