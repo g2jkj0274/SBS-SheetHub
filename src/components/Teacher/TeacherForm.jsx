@@ -87,12 +87,22 @@ function TeacherForm({ mode, initialValue, onCancel, onCreate, onUpdate }) {
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-row">
             <label className="label">Name</label>
-            <input className="input" value={name} onChange={(e) => setName(e.target.value)} />
+            <input 
+              className="input" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)}
+              placeholder="예) 홍길동"
+            />
           </div>
 
           <div className="form-row">
             <label className="label">Department</label>
-            <input className="input" value={department} onChange={(e) => setDepartment(e.target.value)} />
+            <input 
+              className="input" 
+              value={department} 
+              onChange={(e) => setDepartment(e.target.value)}
+              placeholder="예) 디자인학과, IT학과"
+            />
           </div>
 
           <div className="form-row">
@@ -101,14 +111,20 @@ function TeacherForm({ mode, initialValue, onCancel, onCreate, onUpdate }) {
               className="input"
               value={subjectsText}
               onChange={(e) => setSubjectsText(e.target.value)}
-              placeholder="예: Java, Spring, Security"
+              placeholder="예) 포토샵, 일러스트, 디자인"
             />
             <div className="hint">쉼표(,)로 여러 과목을 입력합니다.</div>
           </div>
 
           <div className="form-row">
             <label className="label">Source</label>
-            <input className="input" value={source} onChange={(e) => setSource(e.target.value)} />
+            <input 
+              className="input" 
+              value={source} 
+              onChange={(e) => setSource(e.target.value)}
+              placeholder="예) 외부 사이트, 직접 제작, 교안 자료"
+            />
+            <div className="hint">교안 출처를 입력합니다.</div>
           </div>
 
           <div className="form-row">
@@ -117,6 +133,7 @@ function TeacherForm({ mode, initialValue, onCancel, onCreate, onUpdate }) {
               <option value="Public">Public</option>
               <option value="Private">Private</option>
             </select>
+            <div className="hint">교안 공개 여부를 선택합니다.</div>
           </div>
 
           <div className="form-actions">
