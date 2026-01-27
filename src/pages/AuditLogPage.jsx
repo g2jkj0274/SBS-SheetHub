@@ -8,6 +8,10 @@ function AuditLogPage() {
   const [loadError, setLoadError] = useState(null)
   const [filterType, setFilterType] = useState('') // 필터: CREATE, READ, UPDATE, DELETE 또는 빈 값(전체)
   const [filterTable, setFilterTable] = useState('') // 필터: teachers, subject_details 또는 빈 값(전체)
+  
+  // 페이지네이션
+  const [pageSize, setPageSize] = useState(20) // 페이지당 표시 개수
+  const [currentPage, setCurrentPage] = useState(1) // 현재 페이지
 
   useEffect(() => {
     loadLogs()
@@ -16,6 +20,7 @@ function AuditLogPage() {
   async function loadLogs() {
     setIsLoading(true)
     setLoadError(null)
+    setCurrentPage(1) // 필터 변경 시 첫 페이지로 초기화
 
     try {
       let query = supabase
@@ -49,6 +54,29 @@ function AuditLogPage() {
 
   const handleFilterChange = () => {
     loadLogs()
+  }
+
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(logs.length / pageSize)
+  const startIndex = (currentPage - 1) * pageSize
+  const endIndex = startIndex + pageSize
+  const paginatedLogs = logs.slice(startIndex, endIndex)
+
+  const handlePageSizeChange = (newSize) => {
+    setPageSize(newSize)
+    setCurrentPage(1) // 페이지 크기 변경 시 첫 페이지로 초기화
+  }
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
   }
 
   const getActionBadgeClass = (action) => {
@@ -117,51 +145,104 @@ function AuditLogPage() {
       {loadError && <div className="error">오류: {loadError}</div>}
 
       {!isLoading && !loadError && (
-        <div className="logs-table-wrapper">
-          <table className="logs-table">
-            <thead>
-              <tr>
-                <th>일시</th>
-                <th>테이블</th>
-                <th>레코드 ID</th>
-                <th>작업</th>
-                <th>변경 전</th>
-                <th>변경 후</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.length === 0 ? (
+        <>
+          <div className="pagination-controls">
+            <div className="page-size-selector">
+              <span>페이지당 표시:</span>
+              <button
+                className={`page-size-btn ${pageSize === 10 ? 'active' : ''}`}
+                onClick={() => handlePageSizeChange(10)}
+              >
+                10개
+              </button>
+              <button
+                className={`page-size-btn ${pageSize === 20 ? 'active' : ''}`}
+                onClick={() => handlePageSizeChange(20)}
+              >
+                20개
+              </button>
+              <button
+                className={`page-size-btn ${pageSize === 50 ? 'active' : ''}`}
+                onClick={() => handlePageSizeChange(50)}
+              >
+                50개
+              </button>
+            </div>
+            <div className="page-info">
+              {logs.length > 0 ? `${startIndex + 1}-${Math.min(endIndex, logs.length)}` : '0'} / 총 {logs.length}개
+            </div>
+          </div>
+
+          <div className="logs-table-wrapper">
+            <table className="logs-table">
+              <thead>
                 <tr>
-                  <td colSpan="6" className="no-data">
-                    변경 이력이 없습니다.
-                  </td>
+                  <th>일시</th>
+                  <th>테이블</th>
+                  <th>레코드 ID</th>
+                  <th>작업</th>
+                  <th>변경 전</th>
+                  <th>변경 후</th>
                 </tr>
-              ) : (
-                logs.map((log) => (
-                  <tr key={log.id}>
-                    <td className="datetime">{formatDateTime(log.changed_at)}</td>
-                    <td className="table-name">{log.table_name}</td>
-                    <td className="record-id">{log.record_id}</td>
-                    <td>
-                      <span className={getActionBadgeClass(log.action)}>{log.action}</span>
-                    </td>
-                    <td className="data-cell">
-                      <pre>{formatJson(log.old_value)}</pre>
-                    </td>
-                    <td className="data-cell">
-                      <pre>{formatJson(log.new_value)}</pre>
+              </thead>
+              <tbody>
+                {paginatedLogs.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="no-data">
+                      {logs.length === 0 ? '변경 이력이 없습니다.' : '표시할 데이터가 없습니다.'}
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+                ) : (
+                  paginatedLogs.map((log) => (
+                    <tr key={log.id}>
+                      <td className="datetime">{formatDateTime(log.changed_at)}</td>
+                      <td className="table-name">{log.table_name}</td>
+                      <td className="record-id">{log.record_id}</td>
+                      <td>
+                        <span className={getActionBadgeClass(log.action)}>{log.action}</span>
+                      </td>
+                      <td className="data-cell">
+                        <pre>{formatJson(log.old_value)}</pre>
+                      </td>
+                      <td className="data-cell">
+                        <pre>{formatJson(log.new_value)}</pre>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
 
-      <div className="log-info">
-        총 {logs.length}개의 변경 이력
-      </div>
+          <div className="pagination-footer">
+            <button
+              className="pagination-btn"
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+            >
+              &lt; 이전
+            </button>
+            <div className="pagination-numbers">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  className={`pagination-number ${currentPage === page ? 'active' : ''}`}
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            <button
+              className="pagination-btn"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages || totalPages === 0}
+            >
+              다음 &gt;
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
