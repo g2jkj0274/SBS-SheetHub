@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 
 function DetailForm({
   mode,
@@ -10,6 +10,7 @@ function DetailForm({
   onUpdate,
 }) {
   const isEdit = mode === 'edit'
+  const [, startTransition] = useTransition()
 
   const [day, setDay] = useState('')
   const [detail, setDetail] = useState('')
@@ -18,10 +19,12 @@ function DetailForm({
 
   useEffect(() => {
     if (!isEdit || !initialValue) return
-    setDay(initialValue.day ?? '')
-    setDetail(initialValue.detail ?? '')
-    setContent(initialValue.content ?? '')
-    setLink(initialValue.link ?? '')
+    startTransition(() => {
+      setDay(initialValue.day ?? '')
+      setDetail(initialValue.detail ?? '')
+      setContent(initialValue.content ?? '')
+      setLink(initialValue.link ?? '')
+    })
   }, [isEdit, initialValue])
 
   const normalizeDay = (value) => {

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 
 function TeacherForm({ mode, initialValue, onCancel, onCreate, onUpdate }) {
   const isEdit = mode === 'edit'
+  const [, startTransition] = useTransition()
 
   const [name, setName] = useState('')
   const [department, setDepartment] = useState('')
@@ -12,11 +13,13 @@ function TeacherForm({ mode, initialValue, onCancel, onCreate, onUpdate }) {
   useEffect(() => {
     if (!isEdit || !initialValue) return
 
-    setName(initialValue.name ?? '')
-    setDepartment(initialValue.department ?? '')
-    setSubjectsText(Array.isArray(initialValue.subjects) ? initialValue.subjects.join(', ') : '')
-    setSource(initialValue.source ?? '')
-    setShare(initialValue.share ?? 'Public')
+    startTransition(() => {
+      setName(initialValue.name ?? '')
+      setDepartment(initialValue.department ?? '')
+      setSubjectsText(Array.isArray(initialValue.subjects) ? initialValue.subjects.join(', ') : '')
+      setSource(initialValue.source ?? '')
+      setShare(initialValue.share ?? 'Public')
+    })
   }, [isEdit, initialValue])
 
   const parseSubjects = (text) => {
@@ -84,22 +87,12 @@ function TeacherForm({ mode, initialValue, onCancel, onCreate, onUpdate }) {
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-row">
             <label className="label">Name</label>
-            <input 
-              className="input" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)}
-              placeholder="예) 홍길동"
-            />
+            <input className="input" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
 
           <div className="form-row">
             <label className="label">Department</label>
-            <input 
-              className="input" 
-              value={department} 
-              onChange={(e) => setDepartment(e.target.value)}
-              placeholder="예) 디자인학과, IT학과"
-            />
+            <input className="input" value={department} onChange={(e) => setDepartment(e.target.value)} />
           </div>
 
           <div className="form-row">
@@ -108,20 +101,14 @@ function TeacherForm({ mode, initialValue, onCancel, onCreate, onUpdate }) {
               className="input"
               value={subjectsText}
               onChange={(e) => setSubjectsText(e.target.value)}
-              placeholder="예) 포토샵, 일러스트, 디자인"
+              placeholder="예: Java, Spring, Security"
             />
             <div className="hint">쉼표(,)로 여러 과목을 입력합니다.</div>
           </div>
 
           <div className="form-row">
             <label className="label">Source</label>
-            <input 
-              className="input" 
-              value={source} 
-              onChange={(e) => setSource(e.target.value)}
-              placeholder="예) 외부 사이트, 직접 제작, 교안 자료"
-            />
-            <div className="hint">교안 출처를 입력합니다.</div>
+            <input className="input" value={source} onChange={(e) => setSource(e.target.value)} />
           </div>
 
           <div className="form-row">
@@ -130,7 +117,6 @@ function TeacherForm({ mode, initialValue, onCancel, onCreate, onUpdate }) {
               <option value="Public">Public</option>
               <option value="Private">Private</option>
             </select>
-            <div className="hint">교안 공개 여부를 선택합니다.</div>
           </div>
 
           <div className="form-actions">
