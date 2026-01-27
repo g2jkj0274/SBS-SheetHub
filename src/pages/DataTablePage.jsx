@@ -4,6 +4,7 @@ import TeacherForm from '../components/Teacher/TeacherForm'
 import SubjectDetailTable from '../components/Subject/SubjectDetailTable'
 import DetailForm from '../components/Subject/DetailForm'
 import { supabase } from '/supabaseClient'
+import { logAudit } from '../utils/auditUtils'
 import '../styles/datatable.css'
 
 function DataTablePage() {
@@ -194,6 +195,9 @@ function DataTablePage() {
         return
       }
 
+      // 변경 이력 기록
+      await logAudit('teachers', teacherId, 'CREATE', null, newRow)
+
       setRows((prev) => [...prev, newRow])
       setSubjectTables((prev) => ({ ...prev, [teacherId]: {} }))
       detailNextIdRef.current[teacherId] = {}
@@ -206,6 +210,9 @@ function DataTablePage() {
 
   const updateRow = async (id, payload) => {
     try {
+      // 변경 전 데이터 저장
+      const oldRow = rows.find((r) => r.id === id)
+
       // Supabase에서 업데이트
       const { error } = await supabase
         .from('teachers')
@@ -216,6 +223,10 @@ function DataTablePage() {
         window.alert(`수정 실패: ${error.message}`)
         return
       }
+
+      // 변경 이력 기록
+      const newRow = { ...oldRow, ...payload, id, subjects: Array.isArray(payload.subjects) ? payload.subjects : (oldRow.subjects ?? []) }
+      await logAudit('teachers', id, 'UPDATE', oldRow, newRow)
 
       setRows((prev) =>
         prev.map((r) =>
@@ -235,6 +246,9 @@ function DataTablePage() {
     if (!ok) return
 
     try {
+      // 삭제 전 데이터 저장
+      const oldRow = rows.find((r) => r.id === id)
+
       // Supabase에서 삭제
       const { error } = await supabase.from('teachers').delete().eq('id', id)
 
@@ -242,6 +256,9 @@ function DataTablePage() {
         window.alert(`삭제 실패: ${error.message}`)
         return
       }
+
+      // 변경 이력 기록
+      await logAudit('teachers', id, 'DELETE', oldRow, null)
 
       setRows((prev) => prev.filter((r) => r.id !== id))
 
@@ -308,6 +325,9 @@ function DataTablePage() {
       // Supabase에서 반환한 생성된 id 사용
       const savedDetail = data && data[0] ? data[0] : { id: Date.now(), ...detailData }
 
+      // 변경 이력 기록
+      await logAudit('subject_details', savedDetail.id, 'CREATE', null, savedDetail)
+
       setSubjectTables((prev) => {
         const teacherTables = prev[selectedTeacherId] ?? {}
         const current = teacherTables[selectedSubject] ?? []
@@ -330,6 +350,11 @@ function DataTablePage() {
     if (!selectedTeacherId || !selectedSubject) return
 
     try {
+      // 변경 전 데이터 저장
+      const teacherTables = subjectTables[selectedTeacherId] ?? {}
+      const current = teacherTables[selectedSubject] ?? []
+      const oldDetail = current.find((r) => r.id === id)
+
       // Supabase에서 업데이트
       const { error } = await supabase
         .from('subject_details')
@@ -340,6 +365,10 @@ function DataTablePage() {
         window.alert(`수정 실패: ${error.message}`)
         return
       }
+
+      // 변경 이력 기록
+      const newDetail = { ...oldDetail, ...payload, id }
+      await logAudit('subject_details', id, 'UPDATE', oldDetail, newDetail)
 
       setSubjectTables((prev) => {
         const teacherTables = prev[selectedTeacherId] ?? {}
@@ -369,6 +398,11 @@ function DataTablePage() {
     if (!ok) return
 
     try {
+      // 삭제 전 데이터 저장
+      const teacherTables = subjectTables[selectedTeacherId] ?? {}
+      const current = teacherTables[selectedSubject] ?? []
+      const oldDetail = current.find((r) => r.id === id)
+
       // Supabase에서 삭제
       const { error } = await supabase.from('subject_details').delete().eq('id', id)
 
@@ -376,6 +410,9 @@ function DataTablePage() {
         window.alert(`삭제 실패: ${error.message}`)
         return
       }
+
+      // 변경 이력 기록
+      await logAudit('subject_details', id, 'DELETE', oldDetail, null)
 
       setSubjectTables((prev) => {
         const teacherTables = prev[selectedTeacherId] ?? {}
