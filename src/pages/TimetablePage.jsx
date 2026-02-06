@@ -46,7 +46,7 @@ function getDaysInMonth(year, month) {
   return days
 }
 
-function TimetablePage() {
+function TimetablePage({ user }) {
   const now = new Date()
   const [year] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1) // 1-12
@@ -291,6 +291,12 @@ function TimetablePage() {
   }
 
   function handleEdit(entry) {
+    // 로그인하지 않은 사용자는 인증 필요
+    if (!user) {
+      alert('로그인이 필요합니다. Header에서 로그인해주세요.')
+      return
+    }
+    
     if (!entry || !entry.id) {
       alert('강의 정보를 불러올 수 없습니다. 페이지를 새로고침 후 다시 시도해주세요.')
       return
@@ -384,9 +390,13 @@ function TimetablePage() {
         </div>
 
         <div className="timetable-controls-right">
-          <button type="button" onClick={() => setShowForm((s) => !s)} className="add-lecture-btn">
-            {showForm ? '등록 닫기' : '강의 추가'}
-          </button>
+          {user ? (
+            <button type="button" onClick={() => setShowForm((s) => !s)} className="add-lecture-btn">
+              {showForm ? '등록 닫기' : '강의 추가'}
+            </button>
+          ) : (
+            <div className="login-required-msg">로그인 후 강의를 추가할 수 있습니다</div>
+          )}
         </div>
       </div>
 

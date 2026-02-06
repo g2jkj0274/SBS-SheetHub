@@ -59,6 +59,142 @@
   font-weight: 600;
 }
 
+.nav-btn.logout-btn {
+  margin-left: 10px;
+  padding: 8px 16px;
+  background-color: #dc2626;
+  color: #ffffff;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+}
+
+.nav-btn.logout-btn:hover {
+  background-color: #b91c1c;
+  color: #ffffff;
+}
+
+.nav-btn.login-btn {
+  margin-left: 10px;
+  padding: 8px 16px;
+  background-color: #0085CD;
+  color: #ffffff;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+}
+
+.nav-btn.login-btn:hover {
+  background-color: #0066a1;
+  color: #ffffff;
+}
+
+.user-email {
+  margin-left: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #666;
+}
+
+/* 로그인 모달 오버레이 */
+.login-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.login-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 350px;
+}
+
+.login-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login-modal-form h2 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.login-modal-form input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.login-modal-form input:focus {
+  outline: none;
+  border-color: #0085CD;
+  box-shadow: 0 0 4px rgba(0, 133, 205, 0.3);
+}
+
+.error-text {
+  color: #dc2626;
+  font-size: 13px;
+  padding: 8px;
+  background: #fee2e2;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-login {
+  flex: 1;
+  padding: 10px;
+  background: #0085CD;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s ease;
+}
+
+.btn-login:hover:not(:disabled) {
+  background: #0066a1;
+}
+
+.btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 10px;
+  background: #e5e7eb;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s ease;
+}
+
+.btn-cancel:hover {
+  background: #d1d5db;
+}
+
 /* 다크모드 */
 @media (prefers-color-scheme: dark) {
   .app-header {

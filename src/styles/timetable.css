@@ -65,6 +65,15 @@
   cursor: pointer;
 }
 
+.login-required-msg {
+  padding: 8px 12px;
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
 /* Lecture form styling */
 .lecture-form {
   display: flex;
