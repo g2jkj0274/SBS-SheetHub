@@ -141,8 +141,55 @@ function TimetablePage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
+    
+    // 필수 필드 검증
+    if (!subject.trim()) {
+      alert('과목명을 입력해주세요.')
+      return
+    }
+    if (!classroom) {
+      alert('강의장을 선택해주세요.')
+      return
+    }
+    if (!subroom) {
+      alert('세부강의장을 선택해주세요.')
+      return
+    }
+    if (!startDate) {
+      alert('개강일을 입력해주세요.')
+      return
+    }
+    if (!endDate) {
+      alert('종강일을 입력해주세요.')
+      return
+    }
+    if (!startTime || startTime === '') {
+      alert('시작 시간을 입력해주세요.')
+      return
+    }
+    if (!endTime || endTime === '') {
+      alert('종료 시간을 입력해주세요.')
+      return
+    }
+    
     const startTimeStr = `${String(startTime).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`
     const endTimeStr = `${String(endTime).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`
+    
+    // 시간 충돌 검사
+    const subroomIdx = parseInt(subroom)
+    const conflicts = entries.filter(e => 
+      e.classroom === classroom &&
+      e.subroom_index === subroomIdx &&
+      // 시간 겹침 조건: 새로운 시작시간 < 기존 종료시간 AND 새로운 종료시간 > 기존 시작시간
+      startTimeStr < e.end_time &&
+      endTimeStr > e.start_time
+    )
+    
+    if (conflicts.length > 0) {
+      const subName = ROOMS.find(r => r.name === classroom)?.subs[subroomIdx]
+      alert(`${classroom} ${subName}에서 시간이 겹치는 강의가 이미 존재합니다.\n기존 강의: ${conflicts[0].subject} (${conflicts[0].start_time}~${conflicts[0].end_time})`)
+      return
+    }
     
     const payload = {
       subject,
@@ -154,13 +201,14 @@ function TimetablePage() {
       end_time: endTimeStr,
       note,
       classroom,
-      subroom_index: parseInt(subroom),
+      subroom_index: subroomIdx,
       created_at: new Date().toISOString(),
     }
     try {
       const { data, error } = await supabase.from('timetables').insert(payload).select()
       if (error) {
         console.error('Insert error', error)
+        alert('강의 등록에 실패했습니다: ' + error.message)
         return
       }
       // append to local state
@@ -179,12 +227,24 @@ function TimetablePage() {
       setSubroom('0')
       setWeekdayPreset('monThu')
       setShowForm(false)
+      alert('강의가 등록되었습니다.')
     } catch (err) {
       console.error(err)
+      alert('오류가 발생했습니다: ' + err.message)
     }
   }
 
   // no-op: weekday selection handled by radio preset `weekdayPreset`
+
+  function handleCancel() {
+    if (subject || instructor || startDate || endDate || note) {
+      if (window.confirm('작성 중인 내용이 있습니다. 정말 취소하시겠습니까?')) {
+        setShowForm(false)
+      }
+    } else {
+      setShowForm(false)
+    }
+  }
 
   return (
     <main className="app-container timetable-page">
@@ -222,42 +282,45 @@ function TimetablePage() {
       </div>
 
       {showForm && (
-        <div className="modal-overlay" onClick={() => setShowForm(false)}>
+        <div className="modal-overlay" onClick={handleCancel}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginTop: 0 }}>{month}월 강의 추가</h3>
             <form onSubmit={handleSubmit} className="lecture-form">
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group full-width">
                   <label htmlFor="subject">과목명</label>
-                  <input id="subject" placeholder="과목명" value={subject} onChange={(e) => setSubject(e.target.value)} required />
+                  <input id="subject" placeholder="과목명" value={subject} onChange={(e) => setSubject(e.target.value)} />
                 </div>
+              </div>
+
+              <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="classroom">강의장</label>
-                  <select id="classroom" value={classroom} onChange={(e) => {setClassroom(e.target.value); setSubroom('0')}} required>
+                  <select id="classroom" value={classroom} onChange={(e) => {setClassroom(e.target.value); setSubroom('0')}}>
                     {ROOMS.map((room) => (
                       <option key={room.name} value={room.name}>{room.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="subroom">세부강의장</label>
+                  <select id="subroom" value={subroom} onChange={(e) => setSubroom(e.target.value)}>
+                    {ROOMS.find(r => r.name === classroom)?.subs.map((s, idx) => (
+                      <option key={idx} value={idx}>{s}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
               <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="subroom">세부강의장</label>
-                  <select id="subroom" value={subroom} onChange={(e) => setSubroom(e.target.value)} required>
-                    {ROOMS.find(r => r.name === classroom)?.subs.map((s, idx) => (
-                      <option key={idx} value={idx}>{s}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
+                <div className="form-group full-width">
                   <label htmlFor="instructor">강사명</label>
                   <input id="instructor" placeholder="강사명" value={instructor} onChange={(e) => setInstructor(e.target.value)} />
                 </div>
               </div>
 
               <div className="form-row">
-                <fieldset className="form-group fieldset-weekday">
+                <fieldset className="form-group fieldset-weekday full-width">
                   <legend>요일</legend>
                   <div className="radio-group">
                     <label><input type="radio" name="preset" checked={weekdayPreset === 'monThu'} onChange={() => setWeekdayPreset('monThu')} /> 월~목</label>
@@ -308,7 +371,7 @@ function TimetablePage() {
 
               <div className="form-row form-actions">
                 <button type="submit" className="btn-submit">등록</button>
-                <button type="button" onClick={() => setShowForm(false)} className="btn-cancel">취소</button>
+                <button type="button" onClick={handleCancel} className="btn-cancel">취소</button>
               </div>
             </form>
           </div>
@@ -368,12 +431,17 @@ function TimetablePage() {
                             const weekdayLabels = ['일', '월', '화', '수', '목', '금', '토']
                             const weekdayStr = startMap.entry.weekdays?.map(d => weekdayLabels[d]).join(',') || ''
                             return (
-                              <td key={ci} className="slot-cell" rowSpan={startMap.span} style={{ background: '#e6f4ff', fontWeight:700 }}>
-                                <div>{startMap.entry.subject}</div>
-                                <div style={{ fontSize: 12 }}>{startMap.entry.instructor}</div>
-                                <div style={{ fontSize: 11, color: '#555' }}>{startMap.entry.classroom}</div>
-                                <div style={{ fontSize: 11, color: '#555' }}>{weekdayStr}</div>
-                                {startMap.entry.note && <div style={{ fontSize: 11, color: '#555' }}>{startMap.entry.note}</div>}
+                              <td key={ci} className="slot-cell slot-cell-lecture" rowSpan={startMap.span}>
+                                <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 13 }}>{startMap.entry.subject}</div>
+                                <div style={{ fontSize: 11, marginBottom: 3 }}>
+                                  <span style={{ fontWeight: 600, color: '#1f2937' }}>
+                                    {startMap.entry.start_time}~{startMap.entry.end_time}
+                                  </span>
+                                </div>
+                                <div style={{ fontSize: 12, marginBottom: 2 }}>{startMap.entry.instructor}</div>
+                                <div style={{ fontSize: 11, color: '#0066cc', marginBottom: 2 }}>{startMap.entry.classroom}</div>
+                                <div style={{ fontSize: 11, color: '#666', marginBottom: 2 }}>{weekdayStr}</div>
+                                {startMap.entry.note && <div style={{ fontSize: 11, color: '#666', fontStyle: 'italic' }}>{startMap.entry.note}</div>}
                               </td>
                             )
                           }
