@@ -78,6 +78,7 @@ function TimetablePage() {
   const [classroom, setClassroom] = useState('A강의장')
   const [subroom, setSubroom] = useState('0')
   const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState(null) // 수정 중인 강의의 ID
 
   // load entries from Supabase
   useEffect(() => {
@@ -175,19 +176,26 @@ function TimetablePage() {
     const startTimeStr = `${String(startTime).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`
     const endTimeStr = `${String(endTime).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`
     
-    // 시간 충돌 검사
+    // 시간 충돌 검사 (요일과 시간 모두 고려)
     const subroomIdx = parseInt(subroom)
-    const conflicts = entries.filter(e => 
-      e.classroom === classroom &&
-      e.subroom_index === subroomIdx &&
-      // 시간 겹침 조건: 새로운 시작시간 < 기존 종료시간 AND 새로운 종료시간 > 기존 시작시간
-      startTimeStr < e.end_time &&
-      endTimeStr > e.start_time
-    )
+    const newWeekdays = PRESETS[weekdayPreset]
+    const conflicts = entries.filter(e => {
+      // 수정 중인 강의는 제외 (id 타입 변환하여 비교)
+      if (editingId && (e.id === editingId || String(e.id) === String(editingId))) return false
+      if (e.classroom !== classroom || e.subroom_index !== subroomIdx) return false
+      
+      // 요일이 겹치는지 확인
+      const existingWeekdays = e.weekdays || []
+      const weekdayOverlap = newWeekdays.some(d => existingWeekdays.includes(d))
+      if (!weekdayOverlap) return false
+      
+      // 요일이 겹치면 시간도 확인
+      return startTimeStr < e.end_time && endTimeStr > e.start_time
+    })
     
     if (conflicts.length > 0) {
       const subName = ROOMS.find(r => r.name === classroom)?.subs[subroomIdx]
-      alert(`${classroom} ${subName}에서 시간이 겹치는 강의가 이미 존재합니다.\n기존 강의: ${conflicts[0].subject} (${conflicts[0].start_time}~${conflicts[0].end_time})`)
+      alert(`${classroom} ${subName}에서 같은 요일의 겹치는 시간대에 강의가 이미 존재합니다.\n기존 강의: ${conflicts[0].subject} (${conflicts[0].start_time}~${conflicts[0].end_time})`)
       return
     }
     
@@ -202,17 +210,37 @@ function TimetablePage() {
       note,
       classroom,
       subroom_index: subroomIdx,
-      created_at: new Date().toISOString(),
     }
+    
     try {
-      const { data, error } = await supabase.from('timetables').insert(payload).select()
-      if (error) {
-        console.error('Insert error', error)
-        alert('강의 등록에 실패했습니다: ' + error.message)
-        return
+      let data, error
+      if (editingId) {
+        // 수정 모드
+        const result = await supabase.from('timetables').update(payload).eq('id', editingId).select()
+        data = result.data
+        error = result.error
+        if (error) {
+          console.error('Update error', error)
+          alert('강의 수정에 실패했습니다: ' + error.message)
+          return
+        }
+        // local state 업데이트
+        setEntries((prev) => prev.map(e => e.id === editingId ? data[0] : e))
+        alert('강의가 수정되었습니다.')
+      } else {
+        // 신규 등록 모드
+        const result = await supabase.from('timetables').insert({ ...payload, created_at: new Date().toISOString() }).select()
+        data = result.data
+        error = result.error
+        if (error) {
+          console.error('Insert error', error)
+          alert('강의 등록에 실패했습니다: ' + error.message)
+          return
+        }
+        // append to local state
+        setEntries((prev) => [...prev, ...(data || [])])
+        alert('강의가 등록되었습니다.')
       }
-      // append to local state
-      setEntries((prev) => [...prev, ...(data || [])])
       // clear form
       setSubject('')
       setInstructor('')
@@ -226,6 +254,7 @@ function TimetablePage() {
       setClassroom('A강의장')
       setSubroom('0')
       setWeekdayPreset('monThu')
+      setEditingId(null)
       setShowForm(false)
       alert('강의가 등록되었습니다.')
     } catch (err) {
@@ -240,9 +269,89 @@ function TimetablePage() {
     if (subject || instructor || startDate || endDate || note) {
       if (window.confirm('작성 중인 내용이 있습니다. 정말 취소하시겠습니까?')) {
         setShowForm(false)
+        setEditingId(null)
+        // form state 초기화
+        setSubject('')
+        setInstructor('')
+        setStartDate('')
+        setEndDate('')
+        setStartTime('09')
+        setStartMinute('00')
+        setEndTime('10')
+        setEndMinute('30')
+        setNote('')
+        setClassroom('A강의장')
+        setSubroom('0')
+        setWeekdayPreset('monThu')
       }
     } else {
       setShowForm(false)
+      setEditingId(null)
+    }
+  }
+
+  function handleEdit(entry) {
+    if (!entry || !entry.id) {
+      alert('강의 정보를 불러올 수 없습니다. 페이지를 새로고침 후 다시 시도해주세요.')
+      return
+    }
+    setSubject(entry.subject)
+    setInstructor(entry.instructor || '')
+    setStartDate(entry.start_date)
+    setEndDate(entry.end_date)
+    const [startH, startM] = entry.start_time.split(':')
+    setStartTime(startH)
+    setStartMinute(startM)
+    const [endH, endM] = entry.end_time.split(':')
+    setEndTime(endH)
+    setEndMinute(endM)
+    setNote(entry.note || '')
+    setClassroom(entry.classroom)
+    setSubroom(String(entry.subroom_index || 0))
+    // weekday preset 역계산
+    const weekdays = entry.weekdays || []
+    if (JSON.stringify(weekdays) === JSON.stringify([1,2,3,4])) setWeekdayPreset('monThu')
+    else if (JSON.stringify(weekdays) === JSON.stringify([1,3])) setWeekdayPreset('monWed')
+    else if (JSON.stringify(weekdays) === JSON.stringify([2,4])) setWeekdayPreset('tueThu')
+    else if (JSON.stringify(weekdays) === JSON.stringify([5])) setWeekdayPreset('fri')
+    else if (JSON.stringify(weekdays) === JSON.stringify([6,0]) || JSON.stringify(weekdays) === JSON.stringify([0,6])) setWeekdayPreset('satSun')
+    // id를 명시적으로 설정
+    const idToSet = entry.id
+    setEditingId(idToSet)
+    setShowForm(true)
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm('이 강의를 삭제하시겠습니까?')) {
+      return
+    }
+    try {
+      const { error } = await supabase.from('timetables').delete().eq('id', id)
+      if (error) {
+        console.error('Delete error', error)
+        alert('강의 삭제에 실패했습니다: ' + error.message)
+        return
+      }
+      setEntries((prev) => prev.filter(e => e.id !== id))
+      // 모달 닫기 및 폼 초기화
+      setShowForm(false)
+      setEditingId(null)
+      setSubject('')
+      setInstructor('')
+      setStartDate('')
+      setEndDate('')
+      setStartTime('09')
+      setStartMinute('00')
+      setEndTime('10')
+      setEndMinute('30')
+      setNote('')
+      setClassroom('A강의장')
+      setSubroom('0')
+      setWeekdayPreset('monThu')
+      alert('강의가 삭제되었습니다.')
+    } catch (err) {
+      console.error(err)
+      alert('오류가 발생했습니다: ' + err.message)
     }
   }
 
@@ -284,7 +393,7 @@ function TimetablePage() {
       {showForm && (
         <div className="modal-overlay" onClick={handleCancel}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ marginTop: 0 }}>{month}월 강의 추가</h3>
+            <h3 style={{ marginTop: 0 }}>{editingId ? '강의 수정' : `${month}월 강의 추가`}</h3>
             <form onSubmit={handleSubmit} className="lecture-form">
               <div className="form-row">
                 <div className="form-group full-width">
@@ -370,8 +479,11 @@ function TimetablePage() {
               </div>
 
               <div className="form-row form-actions">
-                <button type="submit" className="btn-submit">등록</button>
+                <button type="submit" className="btn-submit">{editingId ? '수정' : '등록'}</button>
                 <button type="button" onClick={handleCancel} className="btn-cancel">취소</button>
+                {editingId && (
+                  <button type="button" onClick={() => handleDelete(editingId)} className="btn-delete">삭제</button>
+                )}
               </div>
             </form>
           </div>
@@ -439,7 +551,7 @@ function TimetablePage() {
                             const borderColor = bgColor
                             
                             return (
-                              <td key={ci} className="slot-cell slot-cell-lecture" rowSpan={startMap.span} style={{ background: bgGradient, borderColor: borderColor, borderLeftColor: bgColor }}>
+                              <td key={ci} className="slot-cell slot-cell-lecture" rowSpan={startMap.span} onClick={() => handleEdit(startMap.entry)} style={{ background: bgGradient, borderColor: borderColor, borderLeftColor: bgColor, cursor: 'pointer' }}>
                                 <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 13, color: '#1f2937' }}>{startMap.entry.subject}</div>
                                 <div style={{ fontSize: 11, marginBottom: 3 }}>
                                   <span style={{ fontWeight: 600, color: bgColor }}>

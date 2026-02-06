@@ -193,6 +193,17 @@
   border-color: #bbb;
 }
 
+.btn-delete {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
 .timetable-table {
   border-collapse: separate;
   border-spacing: 0 4px;
