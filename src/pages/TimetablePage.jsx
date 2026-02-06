@@ -365,7 +365,7 @@ function TimetablePage() {
               <div className="form-row">
                 <div className="form-group full-width">
                   <label htmlFor="note">비고</label>
-                  <input id="note" placeholder="비고" value={note} onChange={(e) => setNote(e.target.value)} />
+                  <textarea id="note" placeholder="비고 (여러 줄 입력 가능)" value={note} onChange={(e) => setNote(e.target.value)} rows={4} style={{ fontFamily: 'inherit', resize: 'vertical' }} />
                 </div>
               </div>
 
@@ -430,18 +430,29 @@ function TimetablePage() {
                             }
                             const weekdayLabels = ['일', '월', '화', '수', '목', '금', '토']
                             const weekdayStr = startMap.entry.weekdays?.map(d => weekdayLabels[d]).join(',') || ''
+                            
+                            // subroom_index에 따른 색상 결정
+                            const subroomIndex = startMap.entry.subroom_index || 0
+                            const subroomColors = ['#0085CD', '#F6AB00', '#10B981']
+                            const bgColor = subroomColors[subroomIndex] || '#0085CD'
+                            const bgGradient = `linear-gradient(135deg, ${bgColor}20 0%, ${bgColor}10 100%)`
+                            const borderColor = bgColor
+                            
                             return (
-                              <td key={ci} className="slot-cell slot-cell-lecture" rowSpan={startMap.span}>
-                                <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 13 }}>{startMap.entry.subject}</div>
+                              <td key={ci} className="slot-cell slot-cell-lecture" rowSpan={startMap.span} style={{ background: bgGradient, borderColor: borderColor, borderLeftColor: bgColor }}>
+                                <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 13, color: '#1f2937' }}>{startMap.entry.subject}</div>
                                 <div style={{ fontSize: 11, marginBottom: 3 }}>
-                                  <span style={{ fontWeight: 600, color: '#1f2937' }}>
+                                  <span style={{ fontWeight: 600, color: bgColor }}>
                                     {startMap.entry.start_time}~{startMap.entry.end_time}
                                   </span>
                                 </div>
-                                <div style={{ fontSize: 12, marginBottom: 2 }}>{startMap.entry.instructor}</div>
-                                <div style={{ fontSize: 11, color: '#0066cc', marginBottom: 2 }}>{startMap.entry.classroom}</div>
+                                <div style={{ fontSize: 12, marginBottom: 2, color: '#374151' }}>{startMap.entry.instructor}</div>
+                                <div style={{ fontSize: 11, color: bgColor, marginBottom: 2, fontWeight: 500 }}>{startMap.entry.classroom}</div>
                                 <div style={{ fontSize: 11, color: '#666', marginBottom: 2 }}>{weekdayStr}</div>
-                                {startMap.entry.note && <div style={{ fontSize: 11, color: '#666', fontStyle: 'italic' }}>{startMap.entry.note}</div>}
+                                <div style={{ fontSize: 10, color: '#999', marginBottom: 2 }}>
+                                  {startMap.entry.start_date} ~ {startMap.entry.end_date}
+                                </div>
+                                {startMap.entry.note && <div style={{ fontSize: 11, color: '#dc2626', fontStyle: 'italic', fontWeight: 500, whiteSpace: 'pre-wrap' }}>{startMap.entry.note}</div>}
                               </td>
                             )
                           }
