@@ -20,6 +20,12 @@ function Header({ currentView, onNavigate }) {
             Table
           </button>
           <button
+            className={`nav-btn ${currentView === 'timetable' ? 'active' : ''}`}
+            onClick={() => onNavigate('timetable')}
+          >
+            Timetable
+          </button>
+          <button
             className={`nav-btn ${currentView === 'audit' ? 'active' : ''}`}
             onClick={() => onNavigate('audit')}
           >

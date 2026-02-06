@@ -1,0 +1,74 @@
+/* Basic timetable styles */
+.timetable-page h2 {
+  margin-bottom: 12px;
+}
+
+.timetable-controls {
+  margin-bottom: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.timetable-controls button {
+  padding: 6px 10px;
+  border: 1px solid var(--muted-border, #ccc);
+  background: white;
+  cursor: pointer;
+}
+
+.timetable-controls button.active {
+  background: var(--accent, #3b82f6);
+  color: white;
+  border-color: transparent;
+}
+
+.timetable-wrap {
+  overflow: auto;
+  border: 1px solid #e4e4e7;
+  background: white;
+}
+
+.timetable-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 900px;
+}
+
+.timetable-table th,
+.timetable-table td {
+  border: 1px solid #e6e6e6;
+  padding: 6px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.timetable-table .time-col,
+.timetable-table .time-cell {
+  width: 90px;
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.timetable-table .room-col {
+  background: #f3f4f6;
+  font-weight: 700;
+}
+
+.timetable-table .subroom-col {
+  background: #fbfbfb;
+}
+
+.timetable-table .slot-cell {
+  height: 36px; /* ~30-40px per 30 min block */
+}
+
+.muted {
+  color: #6b7280;
+}
+
+@media (max-width: 700px) {
+  .timetable-table {
+    min-width: 700px;
+  }
+}

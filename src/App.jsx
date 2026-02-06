@@ -2,11 +2,12 @@ import { useState } from 'react'
 import Header from './components/Common/Header'
 import DataTablePage from './pages/DataTablePage'
 import AuditLogPage from './pages/AuditLogPage'
+import TimetablePage from './pages/TimetablePage'
 import ClockRing from './components/Common/ClockRing'
 import './styles/app.css'
 
 function App() {
-  const [view, setView] = useState('home') // home | table | audit
+  const [view, setView] = useState('home') // home | table | audit | timetable
 
   return (
     <>
@@ -14,6 +15,8 @@ function App() {
 
       {view === 'table' ? (
         <DataTablePage />
+      ) : view === 'timetable' ? (
+        <TimetablePage />
       ) : view === 'audit' ? (
         <AuditLogPage />
       ) : (
