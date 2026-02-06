@@ -8,6 +8,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  justify-content: space-between;
 }
 
 .timetable-controls button {
@@ -29,6 +30,152 @@
   background: white;
 }
 
+/* Modal for lecture form */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  max-width: 920px;
+  width: calc(100% - 48px);
+}
+
+.add-lecture-btn {
+  padding: 6px 10px;
+  border: 1px solid var(--muted-border, #ccc);
+  background: white;
+  cursor: pointer;
+}
+
+/* Lecture form styling */
+.lecture-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-row.form-actions {
+  grid-template-columns: auto auto;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Fieldset styling for weekday */
+.fieldset-weekday {
+  grid-column: 1 / -1;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 0;
+}
+
+.fieldset-weekday legend {
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+  padding: 0 4px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Form buttons */
+.btn-submit,
+.btn-cancel {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-submit {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.btn-submit:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.btn-cancel {
+  background: white;
+  color: #666;
+  border-color: #ddd;
+}
+
+.btn-cancel:hover {
+  background: #f5f5f5;
+  border-color: #bbb;
+}
+
 .timetable-table {
   border-collapse: collapse;
   width: 100%;
@@ -41,6 +188,10 @@
   padding: 6px;
   text-align: center;
   vertical-align: middle;
+  /* allow wrapping long room names rather than expanding one column */
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .timetable-table .time-col,
@@ -61,6 +212,21 @@
 
 .timetable-table .slot-cell {
   height: 36px; /* ~30-40px per 30 min block */
+}
+
+/* Make remaining columns share available space evenly and give subroom cells some minimum width */
+.timetable-table {
+  table-layout: fixed;
+}
+
+.timetable-table .subroom-col,
+.timetable-table td.slot-cell {
+  min-width: 72px;
+}
+
+/* slightly more padding for room headers to allow wrap */
+.timetable-table .room-col {
+  padding: 8px 6px;
 }
 
 .muted {
