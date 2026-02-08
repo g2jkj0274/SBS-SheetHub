@@ -1,0 +1,588 @@
+/* Lecture Detail Modal */
+.lecture-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+}
+
+.lecture-detail-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 700px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.lecture-detail-header {
+  padding: 20px;
+  border-bottom: 2px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lecture-detail-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+/* Tabs */
+.lecture-detail-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fafafa;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.tab-btn:hover {
+  color: #333;
+  background: #f0f0f0;
+}
+
+.tab-btn.active {
+  color: #0085CD;
+  border-bottom-color: #0085CD;
+  background: white;
+}
+
+/* Content */
+.lecture-detail-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Info Tab */
+.info-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row label {
+  font-weight: 600;
+  color: #666;
+  font-size: 14px;
+}
+
+.info-row span {
+  color: #333;
+  font-size: 14px;
+}
+
+.note-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #d32f2f;
+}
+
+/* Attendance Tab */
+.attendance-tab {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Enroll Form */
+.enroll-form {
+  padding: 16px;
+  background: #f9f9f9;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 12px;
+}
+
+.enroll-form h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Enroll Mode Tabs */
+.enroll-mode-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #ddd;
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 8px 12px;
+  background: white;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.mode-tab:hover {
+  color: #333;
+}
+
+.mode-tab.active {
+  color: #10B981;
+  border-bottom-color: #10B981;
+}
+
+.enroll-mode-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.enroll-form-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.student-select {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  color: #333;
+}
+
+.student-select:focus {
+  outline: none;
+  border-color: #0085CD;
+  box-shadow: 0 0 0 2px rgba(0, 133, 205, 0.1);
+}
+
+.student-select:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* New Student Form */
+.new-student-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  color: #333;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #10B981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+}
+
+.form-input:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.form-input::placeholder {
+  color: #999;
+}
+
+.new-student-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.btn-enroll {
+  flex: 1;
+  padding: 8px 16px;
+  background: #10B981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-enroll:hover:not(:disabled) {
+  background: #0d9370;
+}
+
+.btn-enroll:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 8px 16px;
+  background: #e0e0e0;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: #d0d0d0;
+}
+
+.btn-cancel:disabled {
+  background: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.enroll-message {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.enroll-message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.enroll-message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.no-available {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* Students List */
+.students-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 16px 16px;
+}
+
+.students-list h4 {
+  margin: 16px 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Attendance Section */
+.attendance-section {
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  border-left: 4px solid #0085CD;
+}
+
+.attendance-title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0085CD;
+}
+
+.attendance-guidance {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  color: #666;
+  padding: 8px;
+  background: #e3f2fd;
+  border-radius: 4px;
+  border-left: 2px solid #0085CD;
+}
+
+.students-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.students-table thead {
+  background: #f5f5f5;
+  border-bottom: 2px solid #ddd;
+}
+
+.students-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #666;
+}
+
+.students-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+
+.students-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.btn-delete-small {
+  padding: 4px 8px;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-delete-small:hover {
+  background: #b71c1c;
+}
+
+/* Attendance Date Manager */
+.attendance-date-manager {
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.date-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.date-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  color: #333;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #0085CD;
+  box-shadow: 0 0 0 2px rgba(0, 133, 205, 0.1);
+}
+
+.btn-add-date {
+  padding: 8px 16px;
+  background: #0085CD;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-add-date:hover {
+  background: #0066a1;
+}
+
+.attendance-dates-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.date-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #333;
+}
+
+.chip-remove {
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.chip-remove:hover {
+  color: #d32f2f;
+}
+
+/* Table Wrapper for Horizontal Scroll */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 6px;
+}
+
+.attendance-date-header {
+  min-width: 60px;
+  text-align: center;
+}
+
+.attendance-cell {
+  min-width: 60px;
+  text-align: center;
+  padding: 8px 4px !important;
+}
+
+.attendance-select {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  text-align: center;
+}
+
+.attendance-select:focus {
+  outline: none;
+  border-color: #0085CD;
+  box-shadow: 0 0 0 2px rgba(0, 133, 205, 0.1);
+}
+
+.attendance-select:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.students-table tbody tr:hover .attendance-select {
+  border-color: #0085CD;
+}
+
+.loading,
+.no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-size: 14px;
+}
+
+/* Footer */
+.lecture-detail-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn-edit {
+  padding: 10px 20px;
+  background: #0085CD;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-edit:hover {
+  background: #0066a1;
+}
+
+.btn-close {
+  padding: 10px 20px;
+  background: #e0e0e0;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-close:hover {
+  background: #d0d0d0;
+}

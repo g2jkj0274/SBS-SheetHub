@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
+import LectureDetailModal from '../components/Lecture/LectureDetailModal'
 import '../styles/timetable.css'
+import '../styles/lecture-detail.css'
 
 const ROOMS = [
   { name: 'A강의장', subs: ['A-1', 'A-2', 'A-3'] },
@@ -79,6 +81,8 @@ function TimetablePage({ user }) {
   const [subroom, setSubroom] = useState('0')
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null) // 수정 중인 강의의 ID
+  const [showDetailModal, setShowDetailModal] = useState(false) // 강의 상세보기 모달
+  const [selectedLecture, setSelectedLecture] = useState(null) // 선택된 강의
 
   // load entries from Supabase
   useEffect(() => {
@@ -288,6 +292,26 @@ function TimetablePage({ user }) {
       setShowForm(false)
       setEditingId(null)
     }
+  }
+
+  // 강의 상세보기 모달 띄우기 (로그인 무관)
+  function handleShowDetail(entry) {
+    if (!entry || !entry.id) {
+      alert('강의 정보를 불러올 수 없습니다.')
+      return
+    }
+    setSelectedLecture(entry)
+    setShowDetailModal(true)
+  }
+
+  // 강의 수정 모달 띄우기 (로그인 필요)
+  function handleEditFromDetail(entry) {
+    if (!user) {
+      alert('로그인이 필요합니다. Header에서 로그인해주세요.')
+      return
+    }
+    setShowDetailModal(false) // 상세보기 모달 닫기
+    handleEdit(entry)
   }
 
   function handleEdit(entry) {
@@ -561,7 +585,7 @@ function TimetablePage({ user }) {
                             const borderColor = bgColor
                             
                             return (
-                              <td key={ci} className="slot-cell slot-cell-lecture" rowSpan={startMap.span} onClick={() => handleEdit(startMap.entry)} style={{ background: bgGradient, borderColor: borderColor, borderLeftColor: bgColor, cursor: 'pointer' }}>
+                              <td key={ci} className="slot-cell slot-cell-lecture" rowSpan={startMap.span} onClick={() => handleShowDetail(startMap.entry)} style={{ background: bgGradient, borderColor: borderColor, borderLeftColor: bgColor, cursor: 'pointer' }}>
                                 <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 13, color: '#1f2937' }}>{startMap.entry.subject}</div>
                                 <div style={{ fontSize: 11, marginBottom: 3 }}>
                                   <span style={{ fontWeight: 600, color: bgColor }}>
@@ -590,6 +614,16 @@ function TimetablePage({ user }) {
             </table>
           </div>
         </div>
+      )}
+
+      {/* 강의 상세보기 모달 */}
+      {showDetailModal && (
+        <LectureDetailModal
+          lecture={selectedLecture}
+          user={user}
+          onClose={() => setShowDetailModal(false)}
+          onEditClick={handleEditFromDetail}
+        />
       )}
     </main>
   )
